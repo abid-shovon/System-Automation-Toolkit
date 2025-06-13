@@ -1,17 +1,27 @@
 import os, shutil, string
+from datetime import datetime
 
+
+def log_action(action_type, data):
+    with open("system_log.txt", "a") as log_file:
+        log_file.write(f"\n[{datetime.now()}] ==== {action_type} ===\n{data}\n")
 
 def show_disk_usage():
-    drives = [f"{d}:/" for d in string.ascii_uppercase
-             if os.path.exists(f"{d}:/")]
+    drives = [f"{a}:/" for a in string.ascii_uppercase if os.path.exists(f"{a}:/")]
     
     for drive in drives:
         total, used, free = shutil.disk_usage(drive)
+        total_gb = total // (2**30)
+        used_gb = used // (2**30)
+        free_gb = free // (2**30)
+
         print(f"Disk usage for {drive}")
-        print(f" -Total: {total // (2**30)} GB")
-        print(f" -Used: {used // (2**30)} GB")
-        print(f" -free: {free // (2**30)} GB \n")
-    
+        print(f" -Total: {total_gb} GB")
+        print(f" -Used: {used_gb} GB")
+        print(f" -Free: {free_gb} GB\n")
+
+        log_data = f"{drive} - Total: {total_gb} GB, Used: {used_gb} GB, Free: {free_gb} GB"
+        log_action("Disk Usage", log_data)
     
 def show_menu():
     print('''
@@ -42,5 +52,4 @@ while True:
     except Exception as e:
         print("Someting is wrong.....!!", e)
     
-
 show_menu()
