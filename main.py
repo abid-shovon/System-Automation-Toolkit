@@ -1,4 +1,5 @@
 import os, shutil, string
+import subprocess, platform
 from datetime import datetime
 
 
@@ -22,7 +23,32 @@ def show_disk_usage():
 
         log_data = f"{drive} - Total: {total_gb} GB, Used: {used_gb} GB, Free: {free_gb} GB"
         log_action("Disk Usage", log_data)
+
+
+def create_user_cross_platform():
+    os_name = platform.system()
     
+    username = input("Enter the new username: ")
+    
+    if os_name == "linux":
+        cmd = ["sudo", "useradd", username]
+    elif os_name == "Windows":
+        password = input(f"Enter password for ({username}) this user name: ")
+        cmd = [ "net", "user", username, password, "/add"]
+    else:
+        print(f"Unsupported OS: {os_name}")
+        return
+    
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    
+    if result.returncode == 0:
+        print(f"User '{username}' created successfully on {os_name}")
+    else:
+        print(f"Failed to create user '{username}': {result.stderr}")
+
+
+
+
 def show_menu():
     print('''
 ===== System Automation Toolkit =====
@@ -42,6 +68,7 @@ while True:
             show_disk_usage()
         elif choice == 2:
             print("Creating a New User...\n")
+            create_user_cross_platform()
         elif choice == 3:
             print("Show System Uptime...\n")
         elif choice == 4:
